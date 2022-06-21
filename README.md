@@ -1,3 +1,3 @@
 # anibase-api
 
-LOL XD
+Keep calm and watch anime.
