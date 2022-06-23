@@ -7,13 +7,13 @@ Base url: [https://api.anibase.co/v1](https://api.anibase.co/v1)
 Welcome to the AniBase API! We're glad you are considering using our API for your amazing project 😍. Before you start diving in, there are some things that you should know.
 
 ### How the server is built
-We (actually I'm a single dev, you get the point) have built our servers using Python 3.10 and the [Django framework](https://www.djangoproject.com/). This is why many things, such as the filtering and other things relate mainly to the Django ORM and other things it provides. For example, a filter looks like this: `filter[titleCanonical.icontains]=seishun+buta`. Here, we are using the Django ORM lookup expressions to specify the match type of the filter. This can be very useful to add some extra customization to your app. We still provide a more complex and simple at a time search filter to make things easier if you don't really require to customize your queries that much. Most of the times, the `filter[search]` filter will work better with matches than filters with lookup expressions. For example, when searching for `Rent-A-Girlfriend`, a request containing `filter[search]=rent+a+gi` will return `Rent-A-Girlfriend` as a result, while `filter[titleCanonical.icontains]=rent+a+gi` will not, as `icontains` searches for an exact substring in the `titleCanonical` field and the field has hyphens, which the query does not. Instead, the `filter[search]` query parameter will return the anime as a result because the query  made is more complex. 
+We (actually I'm a single dev, you get the point) have built our servers using Python 3.10 and the [Django framework](https://www.djangoproject.com/). This is why many things, such as the filtering and other things relate mainly to the Django ORM.
 
 ## The JSON:API Specification
 AniBase's API (sort of) follows the JSON:API Spec, which you can find at [https://jsonapi.org](https://jsonapi.org). The JSON:API schema is very extense and we do our best to follow it, but there are some (small) modifications you will notice.
 
 ### Specifying request headers
-The API will not respond to any request which does not have the following headers.
+The API will not respond to any request that does not have the following headers.
 ```http
 Accept: application/vnd.api+json
 Content-Type: application/vnd.api+json
@@ -22,32 +22,25 @@ The `Accept` header is required in every request. However, the `Content-Type` he
 
 ### Pagination
 Pagination follows the JSON:API pagination schema. Here is an example of a paginated response.
-```json
+```javascript
 {
   "data": [
-    {
-      "type": "anime",
-      "id": "1",
-      "attributes": {
-        "titles": {},
-        "titleCanonical": ""
-      }
-    }
+    // [Insert response objects]
   ],
   "links": {
-    "prev": "url",
-    "next": "url",
-    "self": "url",
-    "first": "url",
-    "last": "url"
+    "prev": Url,
+    "next": Url,
+    "self": Url,
+    "first": Url,
+    "last": Url
   },
   "meta": {
     "pagination": {
-      "count": 115,
-      "limit": 50,
-      "offset": 0
+      "count": Integer,
+      "limit": Integer,
+      "offset": Integer
     },
-    "language": "en"
+    "language": String
   }
 }
 ```
@@ -55,8 +48,66 @@ You can specify the pages with the `page[limit]` and `page[offset]` query parame
 
 Paginated responses have 3 properties in their root object: `data`, `links` and `meta`. The `data` property will return an array with all objects for the page, the `links` property has an object with links for pagination, and the `meta` property has non-standard properties, which usually are a `pagination` property with some extra details about the pagination, and a `language` property, which is the current language of the request. For more information about response's language, refer to the [language](#language) section.
 
+### Resource objects
+Resource objects also follow a specific format. You can read all the details at [jsonapi.org/format/](https://jsonapi.org/format/#document-resource-objects). A resource object follows the following format:
+```javascript
+{
+  "type": "object-type",
+  "id": "resource-id",
+  "attributes": {},
+  "relationships": {},
+  "links": {}
+}
+```
+
+From the JSON:API specification:
+> The `type` member is used to describe resource objects that share common attributes and relationships.
+> The `id` member is not required when the resource object originates at the client and represents a new resource to be created on the server.
+
+`id` and `type` properties will always be strings, although in most cases the `id` will contain only numbers.
+
+The `attributes` property contains all the resource object's attributes. For example, an `anime` resource which contains a `title` and a `genres` property will return something like this:
+```javascript
+{
+  "type": "anime",
+  "id": "12.5", // Actual IDs have no decimals
+  "attributes": {
+    "title": "Cute lil' cat",
+    "genres": [
+      "Comedy",
+      "Slice of life"
+    ]
+  },
+  "links": {
+    "self": {
+      "href": "https://api.anibase.co/anime/12.5",
+      "meta": {
+        "website": "https://anibase.co/anime/12.5"
+      }
+    }
+  },
+  "relationships": {
+    "characters": {
+      "data": [
+        { "type": "character", "id": "1" },
+        { "type": "character", "id": "2" }
+      ]
+    }
+  }
+}
+```
+
+The `links` object returns additional information about links (yes, you've guessed right). You can find more information about the `links` object at [jsonapi.org/format/](https://jsonapi.org/format/#document-links).
+
+The `relationships` property and the `links` property are optional.
+
+#### Relationships
+A resource object's relationships are returned in the `relationships` property. This is like the `attributes` property, but only for relationships. You can find more information about `relationships` at [jsonapi.org/format/](https://jsonapi.org/format/#document-resource-object-relationships).
+
+**WARNING: We do not support the `include` query parameter and neither we send an error when you use it in the requests, as specified in the JSON:API spec.**
+
 ### Filtering and searching
-You can query the data returned in paginated response by using filters. These are query parameters that follow a `filter[name.lookup]=value` format. The regex would be `filter\[([a-zA-Z|_]+).{0,1}([a-zA-Z|_]+)?\]` if it's easier for you.
+You can query the data returned in paginated response by using filters. These are query parameters that follow a `filter[name.lookup]=value` format. The regex would be `filter\[([a-zA-Z|_]+).?([a-zA-Z|_]+)?\]`.
 
 #### Filter `name`
 The filter name specifies the field you are filtering. For example, if you want to filter the query to only return animes with the genre `comedy`, then you will have to add a query parameter like this: `filter[genres]=comedy`.
@@ -86,3 +137,13 @@ Depending on the filter, values are formatted in different ways. This usually de
 | `boolean`| `true`, `false` or `null`         |
 
 `lists` can contain multiple `choice` values. For example, when filtering animes by genre, you can do `filter[genres]=romance,comedy` to return animes with both genres.
+
+## Language
+The API currently supports two languages, English and Spanish. By default, API responses are in English. When requests are authenticated, the default language is the user's preferred language.
+
+You can specify the language by using the `language` query parameter.
+- `en`: English
+- `es`: Spanish (Español)
+
+**WARNING: If something is missing translation, it will return `null` instead of the default English value. This means that although x field cannot return a null value, it will if it is not translated. If your app supports translation, consider that anything can return null at any time.**
+
