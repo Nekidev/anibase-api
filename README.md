@@ -67,5 +67,22 @@ As we previously metioned, we use the Django ORM default lookup expressions for 
 - `contains`: Contains a substring (case sensitive)
 - `iexact`: Exact match (case insensitive)
 - `exact`: Exact match (case sensitive)
+- `isnull`: If the field is null or not
 
 There are more lookup expressions (not all lookup expressions are allowed for all fields, and some fields cannot have lookup expressions) which you can find at the Django documentation.
+
+#### The search filter
+In some cases, there is an extra filter parameter, the `filter[search]` parameter. This parameter makes a more complex query than the other filters, so we strongly recommend using it if allowed. This parameter has no lookup expressions, so doing `filter[search.iexact]` will make the filter invalid and won't work.
+
+#### Filter value types
+Depending on the filter, values are formatted in different ways. This usually depends on the type of the field and the lookup expression being used.
+
+| Name     | Format                            |
+|----------|-----------------------------------|
+| `string` | Plain text                        |
+| `number` | A number, with or without decimals|
+| `choice` | An option from a list of choices  |
+| `list`   | A `,` delimited list of values.   |
+| `boolean`| `true`, `false` or `null`         |
+
+`lists` can contain multiple `choice` values. For example, when filtering animes by genre, you can do `filter[genres]=romance,comedy` to return animes with both genres.
