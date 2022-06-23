@@ -138,6 +138,18 @@ Depending on the filter, values are formatted in different ways. This usually de
 
 `lists` can contain multiple `choice` values. For example, when filtering animes by genre, you can do `filter[genres]=romance,comedy` to return animes with both genres.
 
+#### Sorting
+Paginated responses can be sorted. To achieve this you can use the `sort` query parameter. The `sort` parameter requires a `list`-type value of fields. For example, `?sort=rating` will sort objects by the rating field, leaving the lowest at the top and the highest at the bottom. You can invert the sorting by adding a `-` prefix to each item of the list. For example, `?sort=-rating,titleCanonical` will sort the results leaving the highest rating objects at the top and ordered from a-z when 2 or more have the same rating value.
+
+This is an example of how items would be ordered with `?sort=-rating,titleCanonical`
+```javascript
+[
+  { "titleCanonical": "Awwsome lil' cats", "rating": 9.5 },
+  { "titleCanonical": "Beautiful lil' cats", "rating": 9.5},
+  { "titleCanonical": "Amazing lik'cats", "rating": 8 }
+]
+```
+
 ## Language
 The API currently supports two languages, English and Spanish. By default, API responses are in English. When requests are authenticated, the default language is the user's preferred language.
 
