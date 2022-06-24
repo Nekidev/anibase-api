@@ -4,7 +4,7 @@ AniBase - Anime and Manga (version 1.0.0)
 Base url: [https://api.anibase.co/v1](https://api.anibase.co/v1)
 
 ## What you should know
-Welcome to the AniBase API! We're glad you are considering using our API for your amazing project 😍. Before you start diving in, there are some things that you should know.
+Welcome to the AniBase API! We're happy to know you are considering using our API for your amazing project 😍. Before you start diving in, there are some things that you should know.
 
 ### How the server is built
 We (actually I'm a single dev, you get the point) have built our servers using Python 3.10 and the [Django framework](https://www.djangoproject.com/). This is why many things, such as the filtering and other things relate mainly to the Django ORM.
@@ -24,24 +24,24 @@ The `Accept` header is required in every request. However, the `Content-Type` he
 Pagination follows the JSON:API pagination schema. Here is an example of a paginated response.
 ```javascript
 {
-  "data": [
-    // [Insert response objects]
-  ],
-  "links": {
-    "prev": Url,
-    "next": Url,
-    "self": Url,
-    "first": Url,
-    "last": Url
-  },
-  "meta": {
-    "pagination": {
-      "count": Integer,
-      "limit": Integer,
-      "offset": Integer
+    "data": [
+        // [Insert response objects]
+    ],
+    "links": {
+        "prev": Url,
+        "next": Url,
+        "self": Url,
+        "first": Url,
+        "last": Url
     },
-    "language": String
-  }
+    "meta": {
+        "pagination": {
+            "count": Integer,
+            "limit": Integer,
+            "offset": Integer
+        },
+        "language": String
+    }
 }
 ```
 You can specify the pages with the `page[limit]` and `page[offset]` query parameters. The `page[limit]` is the amount of objects returned per page, and the `page[offset]` is the start index of the page. For example, a page with `page[limit]=10` and `page[offset]=20` will return items from 21 to 30. Notice that for demonstration, brackets are shown without encoding, but you should make requests using `%5B` (`[`) and `%5D` (`]`). The same applies for any query parameter.
@@ -52,11 +52,11 @@ Paginated responses have 3 properties in their root object: `data`, `links` and 
 Resource objects also follow a specific format. You can read all the details at [jsonapi.org/format/](https://jsonapi.org/format/#document-resource-objects). A resource object follows the following format:
 ```javascript
 {
-  "type": "object-type",
-  "id": "resource-id",
-  "attributes": {},
-  "relationships": {},
-  "links": {}
+    "type": "object-type",
+    "id": "resource-id",
+    "attributes": {},
+    "relationships": {},
+    "links": {}
 }
 ```
 
@@ -69,31 +69,31 @@ From the JSON:API specification:
 The `attributes` property contains all the resource object's attributes. For example, an `anime` resource which contains a `title` and a `genres` property will return something like this:
 ```javascript
 {
-  "type": "anime",
-  "id": "12.5", // Actual IDs have no decimals
-  "attributes": {
-    "title": "Cute lil' cat",
-    "genres": [
-      "Comedy",
-      "Slice of life"
-    ]
-  },
-  "links": {
-    "self": {
-      "href": "https://api.anibase.co/anime/12.5",
-      "meta": {
-        "website": "https://anibase.co/anime/12.5"
-      }
+    "type": "anime",
+    "id": "12.5", // Actual IDs have no decimals
+    "attributes": {
+        "title": "Cute lil' cat",
+        "genres": [
+            "Comedy",
+            "Slice of life"
+        ]
+    },
+    "links": {
+        "self": {
+            "href": "https://api.anibase.co/anime/12.5",
+            "meta": {
+                "website": "https://anibase.co/anime/12.5"
+            }
+        }
+    },
+    "relationships": {
+        "characters": {
+            "data": [
+                { "type": "character", "id": "1" },
+                { "type": "character", "id": "2" }
+            ]
+        }
     }
-  },
-  "relationships": {
-    "characters": {
-      "data": [
-        { "type": "character", "id": "1" },
-        { "type": "character", "id": "2" }
-      ]
-    }
-  }
 }
 ```
 
@@ -144,9 +144,9 @@ Paginated responses can be sorted. To achieve this you can use the `sort` query 
 This is an example of how items would be ordered with `?sort=-rating,titleCanonical`
 ```javascript
 [
-  { "titleCanonical": "Awwsome lil' cats", "rating": 9.5 },
-  { "titleCanonical": "Beautiful lil' cats", "rating": 9.5},
-  { "titleCanonical": "Amazing lik'cats", "rating": 8 }
+    { "titleCanonical": "Awesome lil' cats", "rating": 9.5 },
+    { "titleCanonical": "Beautiful lil' cats", "rating": 9.5},
+    { "titleCanonical": "Amazing lil'cats", "rating": 8 }
 ]
 ```
 
@@ -158,4 +158,3 @@ You can specify the language by using the `language` query parameter.
 - `es`: Spanish (Español)
 
 **WARNING: If something is missing translation, it will return `null` instead of the default English value. This means that although x field cannot return a null value, it will if it is not translated. If your app supports translation, consider that anything can return null at any time.**
-
